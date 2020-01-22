@@ -4,8 +4,7 @@ const path = require("path");
 const app = express();
 const axios = require('axios')
 const port = process.env.PORT || 3009;
-const Nightmare = require('nightmare')
-const { exec } = require('child_process');
+const cheerio = require('cheerio');
 
 app.use(express.static("dist"));
 app.use(
