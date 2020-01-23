@@ -40,7 +40,8 @@ nightmare
         page.push({
             url : ele.children[0].href,
             image : ele.children[0].children[0].children[0].src, 
-            // title : ele.children[0].children[1].children[2].innerHTML
+            title : ele.children[0].children[1].children[0].children[1].innerHTML.split('\n')[1].trim(),
+            itemNum: ele.children[0].children[1].children[0].children[0].innerHTML.split('</span>')[1]
         })
     })
     return page;
