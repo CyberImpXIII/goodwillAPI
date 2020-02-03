@@ -6,7 +6,7 @@ const axios = require('axios')
 const port = process.env.PORT || 3009;
 const Nightmare = require('nightmare');
 
-const URL = (search = 'gamecube', page = 1)=>(`https://www.shopgoodwill.com/
+const URL = (search = 'gamecube', page = 1,  discriptions = false)=>(`https://www.shopgoodwill.com/
 Listings?st=${search}
 &sg=
 &c=
@@ -17,16 +17,16 @@ Listings?st=${search}
 &spo=false
 &snpo=false
 &socs=false
-&sd=false
+&sd=${discriptions}${/* this determines if we are going to search the item descriptions as well, it should default false */''}
 &sca=false
 &caed=2/3/2020
 &cadb=7
-&scs=false
-&sis=false
-&col=0
-&p=${page}
-&ps=10
-&desc=false
+&scs=false${/* TODO determine exact functionality, has to do with canadian listings "The Canada Field is Required" */''}
+&sis=false${/* TODO determine exact functionality, has to do with canadian listings "The Outside Canada Field is Required" */''}
+&col=0${/* determines orderBy criteria,  TODO determine number and criteria correlation */''}
+&p=${page}${/* this determines what page we load */''}
+&ps=40${/* this determines what the page size is, and seems to not do anything when changed */''}
+&desc=${desc}${/* this determines if we are going to sort descending, it should default false */''}
 &ss=0
 &UseBuyerPrefs=true`)
 let searchString;
@@ -45,7 +45,10 @@ app.use(
 );
 
 app.get('/api/singlepage',(req,res)=>{
-    nightmare = Nightmare({show: true})
+    let nightmare = Nightmare({show: true,
+        webPreferences: {
+            images: false
+        }})
 
     nightmare
     .goto(URL(req.query.search, req.query.page))
