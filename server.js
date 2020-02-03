@@ -5,9 +5,30 @@ const app = express();
 const axios = require('axios')
 const port = process.env.PORT || 3009;
 const Nightmare = require('nightmare');
-nightmare = Nightmare({show: true})
 
-const URL = `https://www.shopgoodwill.com/`
+const URL = (search = 'gamecube', page = 1)=>(`https://www.shopgoodwill.com/
+Listings?st=${search}
+&sg=
+&c=
+&s=
+&lp=0
+&hp=999999
+&sbn=false
+&spo=false
+&snpo=false
+&socs=false
+&sd=false
+&sca=false
+&caed=2/3/2020
+&cadb=7
+&scs=false
+&sis=false
+&col=0
+&p=${page}
+&ps=10
+&desc=false
+&ss=0
+&UseBuyerPrefs=true`)
 let searchString;
 
 //this function creates the URL segment of for API that determines what the search string
@@ -23,12 +44,11 @@ app.use(
   })
 );
 
-app.get('/api',(req,res)=>{
+app.get('/api/singlepage',(req,res)=>{
+    nightmare = Nightmare({show: true})
+
     nightmare
-    .goto(URL)
-    .wait('button[aria-label="Search"]')
-    .type('input[name="SearchText"]', 'gamecube')
-    .click('button[aria-label="Search"]')
+    .goto(URL(req.query.search, req.query.page))
     .wait()
     .evaluate(() =>{ 
         let page = []
@@ -41,9 +61,16 @@ app.get('/api',(req,res)=>{
                 itemNum: ele.children[0].children[1].children[0].children[0].innerHTML.split('</span>')[1]
             })
         })
-        return page;
+        const data = {
+            data : page,
+            url : window.location.href,
+            page : window.location.href[window.location.href.indexOf('p=', 170) + 2]
+
+        }
+        return data;
     })
-    .end(res.send)
+    .end((results)=>{
+    res.send(results)});
 })
 
 app.listen(port, ()=>{
