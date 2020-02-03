@@ -24,26 +24,28 @@ app.use(
 );
 
 app.get('/api',(req,res)=>{
-res.send('test');
+    nightmare
+    .goto(URL)
+    .wait('button[aria-label="Search"]')
+    .type('input[name="SearchText"]', 'gamecube')
+    .click('button[aria-label="Search"]')
+    .wait()
+    .evaluate(() =>{ 
+        let page = []
+        Array.from(document.querySelector(`ul.products`).children).forEach((ele)=>{
+            console.log(ele)
+            page.push({
+                url : ele.children[0].href,
+                image : ele.children[0].children[0].children[0].src, 
+                title : ele.children[0].children[1].children[0].children[1].innerHTML.split('\n')[1].trim(),
+                itemNum: ele.children[0].children[1].children[0].children[0].innerHTML.split('</span>')[1]
+            })
+        })
+        return page;
+    })
+    .end(res.send)
 })
 
-nightmare
-.goto(URL)
-.wait()
-.type('input[name="SearchText"]', 'gamecube')
-.click('button[aria-label="Search"]')
-.wait()
-.evaluate(() =>{ 
-    let page = []
-    Array.from(document.querySelector(`ul.products`).children).forEach((ele)=>{
-        console.log(ele)
-        page.push({
-            url : ele.children[0].href,
-            image : ele.children[0].children[0].children[0].src, 
-            title : ele.children[0].children[1].children[0].children[1].innerHTML.split('\n')[1].trim(),
-            itemNum: ele.children[0].children[1].children[0].children[0].innerHTML.split('</span>')[1]
-        })
-    })
-    return page;
+app.listen(port, ()=>{
+    console.log(`server is listening on port ${port}`)
 })
-.end(console.log)
